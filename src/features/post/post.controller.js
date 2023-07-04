@@ -1,14 +1,21 @@
 import PostModel from './post.model.js';
 import CommentModel from '../comment/comment.model.js';
+import LikeModel from '../like/like.model.js';
 
 export default class PostController{
+    
     // Get all the posts of all the users for news feed
     getAllPosts(req, res){
         let posts = PostModel.getAll();
 
+        let self = this;
         posts = posts.map((post) => {
-            let postComments = CommentModel.getPostComments(post.id);
+            const postComments = CommentModel.getPostComments(post.id);
+            const postLikes = LikeModel.getPostLikes(post.id);
+
             post.comments = postComments.length;
+            post.likes = postLikes.length;
+
             return post;
         });
         
@@ -23,8 +30,11 @@ export default class PostController{
         if(!post) res.status(400).send("Post not found");
 
         else {
-            let postComments = CommentModel.getPostComments(post.id);
+            const postComments = CommentModel.getPostComments(post.id);
+            const postLikes = LikeModel.getPostLikes(post.id);
+
             post.comments = postComments.length;
+            post.likes = postLikes.length;
 
             res.status(200).send(post);
         }
@@ -36,9 +46,14 @@ export default class PostController{
         if(!posts || posts.length == 0) res.status(200).send([]);
 
         else {
+            let self = this;
             posts = posts.map((post) => {
-                let postComments = CommentModel.getPostComments(post.id);
+                const postComments = CommentModel.getPostComments(post.id);
+                const postLikes = LikeModel.getPostLikes(post.id);
+
                 post.comments = postComments.length;
+                post.likes = postLikes.length;
+
                 return post;
             });
             
