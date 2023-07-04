@@ -1,6 +1,7 @@
 import PostModel from './post.model.js';
 import CommentModel from '../comment/comment.model.js';
 import LikeModel from '../like/like.model.js';
+import { ApplicationError } from '../../error-handler/applicationError.js';
 
 export default class PostController{
     
@@ -27,7 +28,7 @@ export default class PostController{
         const id = req.params.id;
 
         let post = PostModel.getUserPost(id);
-        if(!post) res.status(400).send("Post not found");
+        if(!post) throw new ApplicationError("Post not found", 400);
 
         else {
             const postComments = CommentModel.getPostComments(post.id);
