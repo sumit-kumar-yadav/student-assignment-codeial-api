@@ -1,21 +1,14 @@
 import express from 'express';
-import swagger from 'swagger-ui-express';
-
 import jwtAuth from './src/middleware/jwt.middleware.js';
 import postRouter from './src/features/post/post.routes.js';
 import commentRouter from './src/features/comment/comment.routes.js';
 import likeRouter from './src/features/like/like.routes.js';
 import userRouter from './src/features/user/user.route.js';
-import apiDocs from './swagger.json' assert { type: 'json' };
-
 
 const server = express();
 const port = 8000;
 
 server.use(express.json());
-
-// Swagger API DOC route
-server.use('/api-docs', swagger.serve, swagger.setup(apiDocs));
 
 server.use('/api/users', userRouter);
 server.use('/api/posts', jwtAuth, postRouter);
