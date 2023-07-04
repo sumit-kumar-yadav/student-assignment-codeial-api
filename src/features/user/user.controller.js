@@ -22,7 +22,7 @@ export default class UserController {
         else {
             const token = jwt.sign(
                 {
-                    userID: user.id,
+                    userId: user.id,
                     email: user.email,
                 },
                 'jwt_secret_key',

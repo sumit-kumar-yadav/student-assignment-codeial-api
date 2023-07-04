@@ -5,10 +5,12 @@ export default class UserModel {
         this.email = email;
         this.password = password;
     }
+
+    static lastId = 3;
   
     static signUp(name, email, password) {
         const newUser = new UserModel(
-            users.length + 1,
+            ++this.lastId,
             name,
             email,
             password,
