@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
 import jwtAuth from './src/middleware/jwt.middleware.js';
 import loggerMiddleware from './src/middleware/logger.middleware.js';
 import errorHandler from './src/middleware/error.handler.middleware.js';
+import connectDB from './src/configs/db.js';
 
 
 import postRouter from './src/features/post/post.routes.js';
@@ -13,6 +15,7 @@ import userRouter from './src/features/user/user.route.js';
 
 const server = express();
 const port = 8000;
+dotenv.config();
 
 server.use(express.json());
 server.use(cors())
@@ -33,7 +36,10 @@ server.use((req, res)=>{
 
 server.use(errorHandler);
 
-server.listen(port, function(err){
+server.listen(port, async function(err){
     if (err) console.log(`Error in running the server: ${err}`); 
-    else console.log('Server is up and listening on port '+ port);
+    else {
+        console.log('Server is up and listening on port '+ port);
+        await connectDB();
+    }
 });
