@@ -7,10 +7,10 @@ const router = express.Router();
 const postController = new PostController();
 
 router.get('/all', postController.getAllPosts);
-router.get('/:id', postController.getOnePost);
+router.get('/:postId', postController.getOnePost);
 router.get('/', postController.getPosts);
 router.post('/', upload.single('imageUrl'), postController.addPost);
-router.delete('/:id', postController.deletePost);
-router.put('/:id', upload.single('imageUrl'), postController.update);
+router.delete('/:postId', postController.deletePost);
+router.put('/:postId', upload.single('imageUrl'), postController.update);
 
 export default router;
