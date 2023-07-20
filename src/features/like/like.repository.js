@@ -2,16 +2,16 @@ import LikeModel from './like.model.js';
 
 export default class LikeRepository {
     
-    async getPostLikes(postId){
-        return  await LikeModel.find({post: postId}).populate('user', '_id name email');
+    async getLikes(id, type){
+        return  await LikeModel.find({likeable: id, on_model: type}).populate('user', '_id name email');
     }
 
-    async getPostLike(postId, userId) {
-        return await LikeModel.findOne({post: postId, user: userId});
+    async getLike(id, userId, type) {
+        return await LikeModel.findOne({likeable: id, user: userId, on_model: type});
     }
 
-    async delete(postId, userId) {
-        return await LikeModel.deleteOne({post: postId, user: userId});
+    async delete(id, userId, type) {
+        return await LikeModel.deleteOne({likeable: id, user: userId, on_model: type});
     }
 
     async add(likeData) {

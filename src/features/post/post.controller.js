@@ -18,7 +18,7 @@ export default class PostController{
 
             posts = await Promise.all(posts.map(async (post) => {
                 const postComments = await this.commentRepository.getPostComments(post.id);
-                const postLikes = await this.likeRepository.getPostLikes(post.id);
+                const postLikes = await this.likeRepository.getLikes(post.id, 'Post');
 
                 post = post.toJSON();
                 post.comments = postComments.length;
@@ -44,7 +44,7 @@ export default class PostController{
 
             else {
                 const postComments = await this.commentRepository.getPostComments(post.id);
-                const postLikes = await this.likeRepository.getPostLikes(post.id);
+                const postLikes = await this.likeRepository.getLikes(post.id, 'Post');
 
                 post = post.toJSON();
                 post.comments = postComments.length;
@@ -67,7 +67,7 @@ export default class PostController{
             else {
                 posts = await Promise.all(posts.map(async (post) => {
                     const postComments = await this.commentRepository.getPostComments(post.id);
-                    const postLikes = await this.likeRepository.getPostLikes(post.id);
+                    const postLikes = await this.likeRepository.getLikes(post.id, 'Post');
     
                     post = post.toJSON();
                     post.comments = postComments.length;

@@ -1,17 +1,33 @@
-import CommentRepository from './comment.repository.js'
+import CommentRepository from './comment.repository.js';
+import LikeRepository from '../like/like.repository.js';
 
 export default class CommentController{
 
     constructor(){
         this.commentRepository = new CommentRepository();
+        this.likeRepository = new LikeRepository();
     }
 
     // Get all the comments of a post
     getComments = async (req, res) => {
         try {
-            const comments = await this.commentRepository.getPostComments(req.params.postId);
-            if(!comments || comments.length == 0) return res.status(200).send([]);
-            else return res.status(200).send(comments);
+            let comments = await this.commentRepository.getPostComments(req.params.postId);
+            
+            if(!comments || comments.length == 0) 
+                return res.status(200).send([]);
+
+            else {
+                comments = await Promise.all(comments.map(async (comment) => {
+                    const commentLikes = await this.likeRepository.getLikes(comment._id, 'Comment');
+
+                    comment = comment.toJSON();
+                    comment.likes = commentLikes.length;
+                    return comment;
+
+                }))
+
+                return res.status(200).send(comments);
+            }
 
         } catch (err) {
             return res.status(500).send("Server error");

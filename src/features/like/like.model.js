@@ -6,11 +6,17 @@ const likeSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-    post: {
-        type:  mongoose.Schema.Types.ObjectId,
-        ref: 'Post',
+    // this defines the object id of the liked object - Post / Comment
+    likeable: {
+        type: mongoose.Schema.ObjectId,
         required: true,
+        refPath: 'on_model'
     },
+    on_model: {
+        type: String,
+        required: true,
+        enum: ['Post', 'Comment']
+    }
 }, {
     timestamps: true
 });

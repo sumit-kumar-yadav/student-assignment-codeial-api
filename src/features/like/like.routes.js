@@ -5,7 +5,7 @@ const router = express.Router();
 
 const likeController = new LikeController();
 
-router.get('/:postId', likeController.getLikes);
-router.get('/toggle/:postId', likeController.toggleLike);
+router.get('/:id', likeController.getLikes);
+router.get('/toggle/:id', likeController.toggleLike);
 
 export default router;
