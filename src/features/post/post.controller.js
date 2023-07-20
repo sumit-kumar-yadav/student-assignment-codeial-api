@@ -1,10 +1,14 @@
 import { ApplicationError } from '../../error-handler/applicationError.js';
 import PostRepository from './post.repository.js';
+import CommentRepository from '../comment/comment.repository.js';
+import LikeRepository from '../like/like.repository.js';
 
 export default class PostController{
 
     constructor(){
         this.postRepository = new PostRepository();
+        this.commentRepository = new CommentRepository();
+        this.likeRepository = new LikeRepository();
     }
     
     // Get all the posts of all the users for news feed
@@ -12,15 +16,16 @@ export default class PostController{
         try {
             let posts = await this.postRepository.getAll();
 
-            // posts = posts.map((post) => {
-            //     const postComments = CommentModel.getPostComments(post.id);
-            //     const postLikes = LikeModel.getPostLikes(post.id);
+            posts = await Promise.all(posts.map(async (post) => {
+                const postComments = await this.commentRepository.getPostComments(post.id);
+                const postLikes = await this.likeRepository.getPostLikes(post.id);
 
-            //     post.comments = postComments.length;
-            //     post.likes = postLikes.length;
+                post = post.toJSON();
+                post.comments = postComments.length;
+                post.likes = postLikes.length;
+                return post;
 
-            //     return post;
-            // });
+            }));
             
             return res.status(200).send(posts);
             
@@ -38,11 +43,12 @@ export default class PostController{
             if(!post) throw new ApplicationError("Post not found", 400);
 
             else {
-                // const postComments = CommentModel.getPostComments(post.id);
-                // const postLikes = LikeModel.getPostLikes(post.id);
+                const postComments = await this.commentRepository.getPostComments(post.id);
+                const postLikes = await this.likeRepository.getPostLikes(post.id);
 
-                // post.comments = postComments.length;
-                // post.likes = postLikes.length;
+                post = post.toJSON();
+                post.comments = postComments.length;
+                post.likes = postLikes.length;
 
                 return res.status(200).send(post);
             }
@@ -59,15 +65,16 @@ export default class PostController{
             if(!posts || posts.length == 0) return res.status(200).send([]);
 
             else {
-                // posts = posts.map((post) => {
-                //     const postComments = CommentModel.getPostComments(post.id);
-                //     const postLikes = LikeModel.getPostLikes(post.id);
-
-                //     post.comments = postComments.length;
-                //     post.likes = postLikes.length;
-
-                //     return post;
-                // });
+                posts = await Promise.all(posts.map(async (post) => {
+                    const postComments = await this.commentRepository.getPostComments(post.id);
+                    const postLikes = await this.likeRepository.getPostLikes(post.id);
+    
+                    post = post.toJSON();
+                    post.comments = postComments.length;
+                    post.likes = postLikes.length;
+    
+                    return post;
+                }));
                 
                 return res.status(200).send(posts);
             }

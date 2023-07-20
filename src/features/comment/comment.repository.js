@@ -7,7 +7,7 @@ export default class CommentRepository {
     }
 
     async getPostComments(postId) { 
-        return await CommentModel.find({post: postId});
+        return await CommentModel.find({post: postId}).populate('user', '_id name email');
     }
 
     async delete(commentId) {
