@@ -1,56 +1,91 @@
-import CommentModel from './comment.model.js';
+import CommentRepository from './comment.repository.js'
 
 export default class CommentController{
 
+    constructor(){
+        this.commentRepository = new CommentRepository();
+    }
+
     // Get all the comments of a post
-    getComments(req, res){
-        const comments = CommentModel.getPostComments(req.params.id);
-        if(!comments || comments.length == 0) res.status(200).send([]);
-        else res.status(200).send(comments);
+    getComments = async (req, res) => {
+        try {
+            const comments = await this.commentRepository.getPostComments(req.params.postId);
+            if(!comments || comments.length == 0) return res.status(200).send([]);
+            else return res.status(200).send(comments);
+
+        } catch (err) {
+            return res.status(500).send("Server error");
+        }
     }
 
     //Delete a comment
-    deleteComment(req, res){
-        const commentId = req.params.id;
-        const userId = req.userId;
+    deleteComment = async (req, res) => {
+        try {
+            const commentId = req.params.commentId;
+            const userId = req.userId;
 
-        const isDeleted = CommentModel.delete(commentId, userId);
+            const comment = await this.commentRepository.getPostComment(commentId);
+            if(!comment) return res.status(400).send("Comment not found");
+            
+            // Comment can only be deleted either by comment owner or post owner.
+            if(!(comment.user == userId || comment.post.user == userId))
+                return res.status(400).send("Cannot delete the comment");
 
-        if(isDeleted) res.status(200).send("Comment is deleted Successfully");
-        else res.status(400).send("Comment cannot be deleted");
+            const isDeleted = await this.commentRepository.delete(commentId);
+
+            if(isDeleted) return res.status(200).send("Comment is deleted Successfully");
+            else return res.status(400).send("Comment cannot be deleted");
+
+        } catch (err) {
+            return res.status(500).send("Server error");
+        }
     }
 
     // Create a new comment
-    addComment(req, res){
-        const postId = req.params.id;
-        const { content } = req.body;
+    addComment = async (req, res) => {
+        try {
+            const postId = req.params.postId;
+            const { content } = req.body;
 
-        const data = {
-            userId: req.userId,
-            postId: postId,
-            content,
+            const data = {
+                user: req.userId,
+                post: postId,
+                content,
+            }
+
+            const comment =  await this.commentRepository.add(data);
+
+            return res.status(201).send(comment);
+
+        } catch (err) {
+            return res.status(500).send("Server error");
         }
-
-        const comment =  CommentModel.add(data);
-
-        res.status(201).send(comment);
     }
 
     // Update a comment
-    update(req, res){
-        const commentId = req.params.id;
+    update = async (req, res) => {
+        try {
+            const commentId = req.params.commentId;
         
-        let comment = CommentModel.getPostComment(commentId);
-        if(!comment) res.status(400).send("Comment not found");
+            let comment = await this.commentRepository.getPostComment(commentId);
+            if(!comment) return res.status(400).send("Comment not found");
 
-        const updatedData = {
-            content : req.body.content || comment.content,
+            // Only comment owner can update the comment
+            if(comment.user != req.userId) 
+                return res.status(400).send("Cannot update the comment");
+
+            const updatedData = {
+                content : req.body.content || comment.content,
+            }
+
+            const isUpdated = await this.commentRepository.update(commentId, updatedData);
+
+            if(isUpdated) return res.status(200).send("Comment is updated Successfully");
+            else return res.status(400).send("Comment cannot be updated");
+
+        } catch (err) {
+            return res.status(500).send("Server error");
         }
-
-        const isUpdated = CommentModel.update(updatedData, req.userId, commentId);
-
-        if(isUpdated) res.status(200).send("Comment is updated Successfully");
-        else res.status(400).send("Comment cannot be updated");
     }
     
 }

@@ -22,10 +22,10 @@ export default class PostController{
             //     return post;
             // });
             
-            res.status(200).send(posts);
+            return res.status(200).send(posts);
             
         } catch (err) {
-            res.status(500).send("Server error");
+            return res.status(500).send("Server error");
         }
     }
 
@@ -44,11 +44,11 @@ export default class PostController{
                 // post.comments = postComments.length;
                 // post.likes = postLikes.length;
 
-                res.status(200).send(post);
+                return res.status(200).send(post);
             }
 
         } catch (err) {
-            res.status(500).send("Server error");
+            return res.status(500).send("Server error");
         }
     }
 
@@ -56,7 +56,7 @@ export default class PostController{
     getPosts = async (req, res) => {
         try {
             let posts = await this.postRepository.getUserPosts(req.userId);
-            if(!posts || posts.length == 0) res.status(200).send([]);
+            if(!posts || posts.length == 0) return res.status(200).send([]);
 
             else {
                 // posts = posts.map((post) => {
@@ -69,11 +69,11 @@ export default class PostController{
                 //     return post;
                 // });
                 
-                res.status(200).send(posts);
+                return res.status(200).send(posts);
             }
 
         } catch (err) {
-            res.status(500).send("Server error");
+            return res.status(500).send("Server error");
         }
     }
 
@@ -89,7 +89,7 @@ export default class PostController{
 
             const isDeleted = await this.postRepository.delete(postId);
 
-            if(isDeleted) res.status(200).send("Post is deleted Successfully");
+            if(isDeleted) return res.status(200).send("Post is deleted Successfully");
             else return res.status(400).send("Post cannot be deleted");
 
         } catch (err) {
@@ -110,10 +110,10 @@ export default class PostController{
 
             const post =  await this.postRepository.add(data);
 
-            res.status(201).send(post);
+            return res.status(201).send(post);
 
         } catch (err) {
-            res.status(500).send("Server error");
+            return res.status(500).send("Server error");
         }
     }
 
@@ -133,11 +133,11 @@ export default class PostController{
 
             const isUpdated = await this.postRepository.update(postId, updatedData);
 
-            if(isUpdated) res.status(200).send("Post is updated Successfully");
-            else res.status(400).send("Post cannot be updated");
+            if(isUpdated) return res.status(200).send("Post is updated Successfully");
+            else return res.status(400).send("Post cannot be updated");
 
         } catch (err) {
-            res.status(500).send("Server error");
+            return res.status(500).send("Server error");
         }
     }
     
