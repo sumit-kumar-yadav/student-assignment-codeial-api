@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 
 const friendshipSchema = new mongoose.Schema({
@@ -24,4 +24,4 @@ const friendshipSchema = new mongoose.Schema({
 });
 
 const Friendship = mongoose.model('Friendship', friendshipSchema);
-module.exports = Friendship;
+export default Friendship;

@@ -13,7 +13,7 @@ export default class UserRepository {
     async signin(email, password) {
         const user = await UserModel.findOne({ email });
         if (!user || !await bcrypt.compare(password, user.password))
-            throw Error('Incorrect email or password');
+            throw new Error('Incorrect email or password');
         return user;
     }
 

@@ -9,7 +9,7 @@ export default class FriendshipRepository {
 
     async getUserFriendships(userId) {
         return await FriendshipModel.find({
-            or: [
+            $or: [
                 { sender: userId, accepted: true },
                 { receiver: userId, accepted: true }
             ]
@@ -43,6 +43,6 @@ export default class FriendshipRepository {
     async updateFriend(sender, receiver, action) {
         return (action == 'accept')
                 ? await FriendshipModel.findOneAndUpdate({sender, receiver}, {accepted: true})
-                : await FriendshipModel.findOneAndUpdate({sender, receiver}, {accepted: false})
+                : await FriendshipModel.findOneAndDelete({sender, receiver})
     }
 }

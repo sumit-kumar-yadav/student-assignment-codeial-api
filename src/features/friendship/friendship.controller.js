@@ -1,7 +1,7 @@
 import { ApplicationError } from '../../error-handler/applicationError.js';
 import FriendshipRepository from './friendship.repository.js';
 
-export default class PostController{
+export default class FriendshipController{
 
     constructor(){
         this.friendshipRepository = new FriendshipRepository();
@@ -10,13 +10,13 @@ export default class PostController{
     // Fetch all the friends of the user
     getUserFriends = async (req, res) => {
         try {
-            const userId = req.userId;
+            const { userId } = req.params;
             const allFriendships = await this.friendshipRepository.getUserFriendships(userId) || [];
 
             let allFriends = await Promise.all(allFriendships.map((friendship) => (
-                (friendship.sender._id == userId) 
-                    ? friendship.sender.toJSON()
-                    : friendship.receiver.toJSON()
+                (friendship.sender._id == req.userId) 
+                    ? friendship.receiver.toJSON()
+                    : friendship.sender.toJSON()
             )));
 
             return res.status(200).send(allFriends);
@@ -58,6 +58,8 @@ export default class PostController{
     toggleFriendship = async (req, res) => {
         try {
             const { friendId } = req.params;
+
+            if(friendId == req.userId) return res.status(400).send("Cannot add friend.");
             
             let friendship = await this.friendshipRepository.get(req.userId, friendId);
 
@@ -82,13 +84,18 @@ export default class PostController{
             const { action } = req.query;
             const { friendId } = req.params;
 
+            let isResponded = false;
+
             if(action == 'accept') 
-                await this.friendshipRepository.updateFriend(friendId, req.userId, 'accept');
+                isResponded = await this.friendshipRepository.updateFriend(friendId, req.userId, 'accept');
             
             else 
-                await this.friendshipRepository.updateFriend(friendId, req.userId, 'reject');
+                isResponded = await this.friendshipRepository.updateFriend(friendId, req.userId, 'reject');
             
-            return res.status(200).send(`Request ${action}ed successfully.`);
+            if(isResponded) 
+                return res.status(200).send(`Request ${action}ed successfully.`);
+            else
+                return res.status(200).send(`Request can't be ${action}ed.`);
 
         } catch (err) {
             return res.status(500).send("Server error");
