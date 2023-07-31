@@ -39,4 +39,16 @@ export default class UserRepository {
     
         await user.save();
     }
+
+    async get(userId) {
+        return await UserModel.findById(userId).select('-password -auth_tokens');
+    }
+
+    async getAll() {
+        return await UserModel.find({}).select('-password -auth_tokens');
+    }
+
+    async update(userId, data) {
+        return await UserModel.findByIdAndUpdate(userId, data);
+    }
 }

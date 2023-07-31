@@ -1,6 +1,8 @@
 import UserRepository from './user.repository.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import res from 'express/lib/response.js';
+import { use } from 'bcrypt/promises.js';
 
 export default class UserController {
     constructor() {
@@ -71,6 +73,60 @@ export default class UserController {
     
         } catch (e) {
             console.log(e);
+            return res.status(500).send("Server error");
+        }
+    }
+
+    getUserDetails = async (req, res) => {
+        try {
+            const { userId } = req.params;
+
+            const user = await this.userRepository.get(userId);
+
+            return res.status(200).send(user || "User not found.");
+
+        } catch (err) {
+            return res.status(500).send("Server error");
+        }
+    }
+
+    getAllUserDetails = async (req, res) => {
+        try {
+            const users = await this.userRepository.getAll();
+
+            return res.status(200).send(users || "No user found");
+
+        } catch (err) {
+            return res.status(500).send("Server error");
+        }
+    }
+
+    updateUserDetails = async(req, res) => {
+        try {
+            const { userId } = req.params;
+
+            if(req.userId != userId) 
+                return res.status(400).send("You are not authorized to update these details.");
+            
+            const user = await this.userRepository.get(userId);
+
+            if(!user) return res.status(400).send("User not found.");
+
+            let updatedData = {
+                name: req.body.name || user.name,
+                gender: req.body.gender || user.gender,
+            }
+
+            // If user uploads image
+            if(req.file) 
+                updatedData.avatar = req.file.filename;
+  
+            let isUpdated = await this.userRepository.update(userId, updatedData);
+
+            if(isUpdated) return res.status(200).send("Updated successfully");
+            else return res.status(400).send("Cannot update user data");
+
+        } catch (err) {
             return res.status(500).send("Server error");
         }
     }
