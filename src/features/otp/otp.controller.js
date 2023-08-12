@@ -20,22 +20,26 @@ export default class OtpController{
             // Delete the previous created otps, if any
             await this.otpRepository.deleteOtps(user._id);
     
-            const otp = await this.otpRepository.createOtp(user._id);
+            const otpDoc = await this.otpRepository.createOtp(user._id);
     
             // Mail the created OTP to the user
             const mailOptions = {
                 from: process.env.EMAIL,
                 to: email,
                 subject: 'Reset password',
-                text: `Hi ${user.name}. Your OTP to reset your password is: ${otp}.`,
+                text: `Hi ${user.name}. Your OTP to reset your password is: ${otpDoc.otp}.`,
             };
 
             transporter.sendMail(mailOptions, (err, info) => {
-                if(err) console.log(err);
-                else console.log('Email sent: ' + info.response);
+                if(err) {
+                    console.log("Error in sending email.", err);
+                    return res.status(500).send("Error in sending email.");
+                }
+                else {
+                    console.log('Email sent: ' + info.response);
+                    return res.status(201).send("OTP is sent on your email. Please check.");
+                }
             });
-    
-            return res.status(201).send("OTP is sent on your email. Please check.");
     
         } catch (err) {
             return res.status(500).send("Server error");

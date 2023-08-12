@@ -1,4 +1,4 @@
-import OtpModel from './like.model.js';
+import OtpModel from './otp.model.js';
 import UserModel from '../user/user.model.js';
 
 export default class OtpRepository {
@@ -23,7 +23,7 @@ export default class OtpRepository {
     }
     
     async validateOtp (otp, userId) {
-        await OtpModel.findOneAndUpdate({ otp, user: userId }, { is_verified: true });
+        return await OtpModel.findOneAndUpdate({ otp, user: userId }, { is_verified: true });
     }
 
     async isOtpVerified(userId){
@@ -31,7 +31,7 @@ export default class OtpRepository {
     }
 
     async updateUserPassword(userId, password){
-        await UserModel.findByIdAndUpdate(userId, { password });
+        return await UserModel.findByIdAndUpdate(userId, { password });
     }
 
 }
